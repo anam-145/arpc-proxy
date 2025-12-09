@@ -5,15 +5,15 @@ use axum::{
 };
 use reqwest::Client;
 
-use crate::{config::ChainConfig, error::AppError, models::rpc::RpcRequest};
+use crate::{config::NetworkConfig, error::AppError, models::rpc::RpcRequest};
 
 pub async fn forward(
     client: &Client,
-    chain_config: &ChainConfig,
+    network: &NetworkConfig,
     request: &RpcRequest,
 ) -> Result<Response, AppError> {
     let response = client
-        .post(&chain_config.base_url)
+        .post(&network.rpc_url)
         .json(request)
         .send()
         .await

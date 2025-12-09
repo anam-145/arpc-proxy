@@ -9,10 +9,18 @@ pub struct ServerConfig {
 }
 
 #[derive(Debug, Deserialize, Clone)]
+pub struct NetworkConfig {
+    pub name: String,
+    pub rpc_url: String,
+}
+
+#[derive(Debug, Deserialize, Clone)]
 pub struct ChainConfig {
     pub name: String,
     pub protocol: String,
-    pub base_url: String,
+    pub mainnet: NetworkConfig,
+    #[serde(default)]
+    pub testnets: HashMap<String, NetworkConfig>,
 }
 
 impl ChainConfig {
@@ -20,8 +28,11 @@ impl ChainConfig {
         self.protocol == "jsonrpc"
     }
 
-    pub fn is_rest(&self) -> bool {
-        self.protocol == "rest"
+    pub fn get_network(&self, network: Option<&str>) -> Option<&NetworkConfig> {
+        match network {
+            None => Some(&self.mainnet),
+            Some(net) => self.testnets.get(net),
+        }
     }
 }
 
@@ -38,7 +49,6 @@ impl Settings {
         let config = Config::builder()
             .add_source(File::with_name("config/default"))
             .add_source(File::with_name(&format!("config/{}", run_mode)).required(false))
-            .add_source(config::Environment::with_prefix("APP").separator("__"))
             .build()?;
 
         config.try_deserialize()
