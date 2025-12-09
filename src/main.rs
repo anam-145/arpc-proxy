@@ -1,5 +1,5 @@
 use axum::{
-    routing::{get, post},
+    routing::{any, get},
     Router,
 };
 use tower_http::trace::TraceLayer;
@@ -22,10 +22,22 @@ async fn main() {
     tracing::info!("Configuration loaded");
     tracing::info!("Server: {}", addr);
     for (id, chain) in &settings.chains {
+        let mut protocols = Vec::new();
+        if chain.mainnet.has_jsonrpc() {
+            protocols.push("jsonrpc");
+        }
+        if chain.mainnet.has_rest() {
+            protocols.push("rest");
+        }
         let networks: Vec<&str> = std::iter::once("mainnet")
             .chain(chain.testnets.keys().map(|s| s.as_str()))
             .collect();
-        tracing::info!("Chain: {} ({}) - {}", id, chain.protocol, networks.join(", "));
+        tracing::info!(
+            "Chain: {} ({}) - {}",
+            id,
+            protocols.join("+"),
+            networks.join(", ")
+        );
     }
 
     let state = AppState::new(settings);
@@ -33,8 +45,8 @@ async fn main() {
     let app = Router::new()
         .route("/health", get(handlers::health::health_check))
         .route("/chains", get(handlers::chain::list_chains))
-        .route("/{chain}", post(handlers::rpc::proxy_rpc_mainnet))
-        .route("/{chain}/{network}", post(handlers::rpc::proxy_rpc_testnet))
+        .route("/{chain}", any(handlers::proxy::proxy_mainnet))
+        .route("/{chain}/{*path}", any(handlers::proxy::proxy_with_path))
         .layer(TraceLayer::new_for_http())
         .with_state(state);
 

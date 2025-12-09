@@ -8,10 +8,19 @@ pub async fn list_chains(State(state): State<AppState>) -> Json<Value> {
         .settings
         .chains
         .iter()
-        .map(|(id, cfg)| ChainInfo {
-            id: id.clone(),
-            name: cfg.name.clone(),
-            protocol: cfg.protocol.clone(),
+        .map(|(id, cfg)| {
+            let mut protocols = Vec::new();
+            if cfg.mainnet.has_jsonrpc() {
+                protocols.push("jsonrpc".to_string());
+            }
+            if cfg.mainnet.has_rest() {
+                protocols.push("rest".to_string());
+            }
+            ChainInfo {
+                id: id.clone(),
+                name: cfg.name.clone(),
+                protocols,
+            }
         })
         .collect();
 

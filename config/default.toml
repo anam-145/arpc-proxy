@@ -4,36 +4,71 @@ port = 3000
 
 [chains.ethereum]
 name = "Ethereum"
-protocol = "jsonrpc"
 
 [chains.ethereum.mainnet]
 name = "Ethereum Mainnet"
-rpc_url = "https://ethereum-rpc.publicnode.com"
+jsonrpc_url = "https://ethereum-rpc.publicnode.com"
 
 [chains.ethereum.testnets.sepolia]
 name = "Ethereum Sepolia"
-rpc_url = "https://ethereum-sepolia-rpc.publicnode.com"
+jsonrpc_url = "https://ethereum-sepolia-rpc.publicnode.com"
 
 [chains.solana]
 name = "Solana"
-protocol = "jsonrpc"
 
 [chains.solana.mainnet]
 name = "Solana Mainnet"
-rpc_url = "https://api.mainnet-beta.solana.com"
+jsonrpc_url = "https://api.mainnet-beta.solana.com"
 
 [chains.solana.testnets.devnet]
 name = "Solana Devnet"
-rpc_url = "https://api.devnet.solana.com"
+jsonrpc_url = "https://api.devnet.solana.com"
 
 [chains.sui]
 name = "Sui"
-protocol = "jsonrpc"
 
 [chains.sui.mainnet]
 name = "Sui Mainnet"
-rpc_url = "https://fullnode.mainnet.sui.io:443"
+jsonrpc_url = "https://fullnode.mainnet.sui.io:443"
 
 [chains.sui.testnets.testnet]
 name = "Sui Testnet"
-rpc_url = "https://fullnode.testnet.sui.io:443"
+jsonrpc_url = "https://fullnode.testnet.sui.io:443"
+
+[chains.bitcoin]
+name = "Bitcoin"
+
+[chains.bitcoin.mainnet]
+name = "Bitcoin Mainnet"
+rest_url = "https://mempool.space/api"
+
+[chains.bitcoin.testnets.testnet4]
+name = "Bitcoin Testnet4"
+rest_url = "https://mempool.space/testnet4/api"
+
+[chains.cosmos]
+name = "Cosmos"
+
+[chains.cosmos.mainnet]
+name = "Cosmos mainnet"
+jsonrpc_url = "https://cosmos.blockpi.network/rpc/v1/public"
+rest_url = "https://cosmos.blockpi.network/lcd/v1/public"
+
+[chains.cosmos.testnets.fallback]
+name = "Cosmos testnet"
+jsonrpc_url = "https://cosmos-rpc.publicnode.com:443"
+
+[chains.stellar]
+name = "Stellar"
+
+[chains.stellar.mainnet]
+name = "Stellar Mainnet"
+rest_url = "https://horizon.stellar.org"
+
+[chains.stellar.testnets.testnet]
+name = "Stellar Testnet"
+rest_url = "https://horizon-testnet.stellar.org"
+
+[chains.stellar.testnets.futurenet]
+name = "Stellar Futurenet"
+rest_url = "https://horizon-futurenet.stellar.org"

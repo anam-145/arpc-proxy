@@ -11,23 +11,29 @@ pub struct ServerConfig {
 #[derive(Debug, Deserialize, Clone)]
 pub struct NetworkConfig {
     pub name: String,
-    pub rpc_url: String,
+    pub jsonrpc_url: Option<String>,
+    pub rest_url: Option<String>,
+}
+
+impl NetworkConfig {
+    pub fn has_jsonrpc(&self) -> bool {
+        self.jsonrpc_url.is_some()
+    }
+
+    pub fn has_rest(&self) -> bool {
+        self.rest_url.is_some()
+    }
 }
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct ChainConfig {
     pub name: String,
-    pub protocol: String,
     pub mainnet: NetworkConfig,
     #[serde(default)]
     pub testnets: HashMap<String, NetworkConfig>,
 }
 
 impl ChainConfig {
-    pub fn is_jsonrpc(&self) -> bool {
-        self.protocol == "jsonrpc"
-    }
-
     pub fn get_network(&self, network: Option<&str>) -> Option<&NetworkConfig> {
         match network {
             None => Some(&self.mainnet),
