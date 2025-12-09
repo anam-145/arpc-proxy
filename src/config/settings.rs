@@ -13,6 +13,7 @@ pub struct NetworkConfig {
     pub name: String,
     pub jsonrpc_url: Option<String>,
     pub rest_url: Option<String>,
+    pub api_key: Option<String>,
 }
 
 impl NetworkConfig {

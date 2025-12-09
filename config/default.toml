@@ -72,3 +72,11 @@ rest_url = "https://horizon-testnet.stellar.org"
 [chains.stellar.testnets.futurenet]
 name = "Stellar Futurenet"
 rest_url = "https://horizon-futurenet.stellar.org"
+
+[chains.etherscan]
+name = "Etherscan"
+
+[chains.etherscan.mainnet]
+name = "Etherscan Mainnet"
+rest_url = "https://api.etherscan.io/v2/api"
+api_key = "YOUR_ETHERSCAN_API_KEY"

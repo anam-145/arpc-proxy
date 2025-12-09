@@ -13,12 +13,10 @@ pub async fn forward(
     method: Method,
     path: &str,
     query: Option<&str>,
+    api_key: Option<&str>,
     body: Option<Body>,
 ) -> Result<Response, AppError> {
-    let url = match query {
-        Some(q) => format!("{}/{}?{}", base_url, path, q),
-        None => format!("{}/{}", base_url, path),
-    };
+    let url = build_url(base_url, path, query, api_key);
 
     let mut request = match method {
         Method::GET => client.get(&url),
@@ -64,4 +62,19 @@ pub async fn forward(
     Ok(builder
         .body(Body::from(body))
         .unwrap_or_else(|_| StatusCode::INTERNAL_SERVER_ERROR.into_response()))
+}
+
+fn build_url(base_url: &str, path: &str, query: Option<&str>, api_key: Option<&str>) -> String {
+    let base = if path.is_empty() {
+        base_url.to_string()
+    } else {
+        format!("{}/{}", base_url, path)
+    };
+
+    match (query, api_key) {
+        (Some(q), Some(key)) => format!("{}?{}&apikey={}", base, q, key),
+        (Some(q), None) => format!("{}?{}", base, q),
+        (None, Some(key)) => format!("{}?apikey={}", base, key),
+        (None, None) => base,
+    }
 }

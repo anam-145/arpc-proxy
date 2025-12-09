@@ -40,6 +40,7 @@ pub async fn proxy_mainnet(
             &state,
             &chain,
             network_config.rest_url.as_ref().unwrap(),
+            network_config.api_key.as_deref(),
             method,
             "",
             query,
@@ -88,6 +89,7 @@ pub async fn proxy_with_path(
                 &state,
                 &chain,
                 testnet_config.rest_url.as_ref().unwrap(),
+                testnet_config.api_key.as_deref(),
                 method,
                 rest_path,
                 query,
@@ -127,6 +129,7 @@ pub async fn proxy_with_path(
             &state,
             &chain,
             network_config.rest_url.as_ref().unwrap(),
+            network_config.api_key.as_deref(),
             method,
             &path,
             query,
@@ -170,6 +173,7 @@ async fn handle_rest(
     state: &AppState,
     chain: &str,
     base_url: &str,
+    api_key: Option<&str>,
     method: Method,
     path: &str,
     query: Option<&str>,
@@ -188,7 +192,17 @@ async fn handle_rest(
         Some(body)
     };
 
-    match rest::forward(&state.http_client, base_url, method, path, query, body).await {
+    match rest::forward(
+        &state.http_client,
+        base_url,
+        method,
+        path,
+        query,
+        api_key,
+        body,
+    )
+    .await
+    {
         Ok(response) => response,
         Err(err) => {
             tracing::error!(error = ?err, "REST proxy failed");
