@@ -107,22 +107,6 @@ pub async fn proxy_with_path(
 
     let network_config = &chain_config.mainnet;
 
-    if method == Method::POST && network_config.has_jsonrpc() {
-        if chain_config.testnets.contains_key(&path) {
-            if let Some(testnet) = chain_config.testnets.get(&path) {
-                if testnet.has_jsonrpc() {
-                    return handle_jsonrpc(
-                        &state,
-                        &chain,
-                        testnet.jsonrpc_url.as_ref().unwrap(),
-                        body,
-                    )
-                    .await;
-                }
-            }
-        }
-    }
-
     if network_config.has_rest() {
         let query = uri.query();
         return handle_rest(
