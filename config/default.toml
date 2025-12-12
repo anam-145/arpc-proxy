@@ -2,6 +2,15 @@
 host = "0.0.0.0"
 port = 3000
 
+[database]
+url = "postgres://postgres:postgres@localhost:5432/arpc_proxy"
+max_connections = 5
+
+[auth]
+enabled = true
+# API Key 만료 시간 (일 단위). 주석 처리하거나 삭제하면 만료 없음
+# key_expiration_days = 30
+
 [chains.ethereum]
 name = "Ethereum"
 

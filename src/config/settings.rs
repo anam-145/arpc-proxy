@@ -9,6 +9,27 @@ pub struct ServerConfig {
 }
 
 #[derive(Debug, Deserialize, Clone)]
+pub struct DatabaseConfig {
+    pub url: String,
+    pub max_connections: u32,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct AuthConfig {
+    pub enabled: bool,
+    pub key_expiration_days: Option<i64>,
+}
+
+impl Default for AuthConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            key_expiration_days: None,
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Clone)]
 pub struct NetworkConfig {
     pub name: String,
     pub jsonrpc_url: Option<String>,
@@ -46,6 +67,9 @@ impl ChainConfig {
 #[derive(Debug, Deserialize, Clone)]
 pub struct Settings {
     pub server: ServerConfig,
+    pub database: DatabaseConfig,
+    #[serde(default)]
+    pub auth: AuthConfig,
     pub chains: HashMap<String, ChainConfig>,
 }
 
