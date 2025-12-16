@@ -10,6 +10,11 @@ max_connections = 5
 enabled = true
 # API Key 만료 시간 (일 단위). 주석 처리하거나 삭제하면 만료 없음
 # key_expiration_days = 30
+# 클라이언트 앱 검증을 위한 시크릿 키 (HMAC-SHA256 서명 검증용)
+# 설정하지 않으면 서명 검증을 건너뜀
+client_secret = "your-secret-key-change-in-production"
+# timestamp 허용 오차 (초 단위, 기본값: 300초 = 5분)
+# timestamp_tolerance_secs = 300
 
 [chains.ethereum]
 name = "Ethereum"

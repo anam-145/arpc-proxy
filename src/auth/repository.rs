@@ -23,14 +23,19 @@ impl ApiKeyRepository {
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                 expires_at TIMESTAMPTZ,
                 is_active BOOLEAN NOT NULL DEFAULT TRUE
-            );
-
-            CREATE INDEX IF NOT EXISTS idx_api_keys_device_id ON api_keys(device_id);
-            CREATE INDEX IF NOT EXISTS idx_api_keys_api_key ON api_keys(api_key);
+            )
             "#,
         )
         .execute(&self.pool)
         .await?;
+
+        sqlx::query("CREATE INDEX IF NOT EXISTS idx_api_keys_device_id ON api_keys(device_id)")
+            .execute(&self.pool)
+            .await?;
+
+        sqlx::query("CREATE INDEX IF NOT EXISTS idx_api_keys_api_key ON api_keys(api_key)")
+            .execute(&self.pool)
+            .await?;
 
         Ok(())
     }

@@ -44,6 +44,8 @@ impl ApiKey {
 #[derive(Debug, Deserialize)]
 pub struct RegisterRequest {
     pub device_id: String,
+    pub timestamp: Option<i64>,
+    pub signature: Option<String>,
 }
 
 #[derive(Debug, Serialize)]

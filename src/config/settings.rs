@@ -18,6 +18,13 @@ pub struct DatabaseConfig {
 pub struct AuthConfig {
     pub enabled: bool,
     pub key_expiration_days: Option<i64>,
+    pub client_secret: Option<String>,
+    #[serde(default = "default_timestamp_tolerance")]
+    pub timestamp_tolerance_secs: i64,
+}
+
+fn default_timestamp_tolerance() -> i64 {
+    300
 }
 
 impl Default for AuthConfig {
@@ -25,6 +32,8 @@ impl Default for AuthConfig {
         Self {
             enabled: false,
             key_expiration_days: None,
+            client_secret: None,
+            timestamp_tolerance_secs: default_timestamp_tolerance(),
         }
     }
 }

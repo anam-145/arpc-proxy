@@ -1,10 +1,27 @@
 use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
 use chrono::{Duration, Utc};
+use hmac::{Hmac, Mac};
+use sha2::Sha256;
 
-use crate::{
-    auth::model::{ApiKey, RegisterRequest, RegisterResponse},
-    state::AppState,
-};
+use crate::auth::model::{ApiKey, RegisterRequest, RegisterResponse};
+
+type HmacSha256 = Hmac<Sha256>;
+
+fn verify_signature(device_id: &str, timestamp: i64, signature: &str, client_secret: &str) -> bool {
+    let message = format!("{}{}", device_id, timestamp);
+
+    let Ok(mut mac) = HmacSha256::new_from_slice(client_secret.as_bytes()) else {
+        return false;
+    };
+
+    mac.update(message.as_bytes());
+
+    let Ok(expected_signature) = hex::decode(signature) else {
+        return false;
+    };
+
+    mac.verify_slice(&expected_signature).is_ok()
+}
 
 pub async fn register(
     State(state): State<AppState>,
@@ -21,6 +38,68 @@ pub async fn register(
             })),
         )
             .into_response();
+    }
+
+    if let Some(ref client_secret) = state.settings.auth.client_secret {
+        let timestamp = match payload.timestamp {
+            Some(ts) => ts,
+            None => {
+                return (
+                    StatusCode::BAD_REQUEST,
+                    Json(serde_json::json!({
+                        "error": {
+                            "code": -32005,
+                            "message": "timestamp is required"
+                        }
+                    })),
+                )
+                    .into_response();
+            }
+        };
+
+        let signature = match payload.signature.as_ref() {
+            Some(sig) => sig,
+            None => {
+                return (
+                    StatusCode::BAD_REQUEST,
+                    Json(serde_json::json!({
+                        "error": {
+                            "code": -32005,
+                            "message": "signature is required"
+                        }
+                    })),
+                )
+                    .into_response();
+            }
+        };
+
+        let now = Utc::now().timestamp();
+        let tolerance = state.settings.auth.timestamp_tolerance_secs;
+        if (now - timestamp).abs() > tolerance {
+            return (
+                StatusCode::UNAUTHORIZED,
+                Json(serde_json::json!({
+                    "error": {
+                        "code": -32003,
+                        "message": "Request timestamp expired"
+                    }
+                })),
+            )
+                .into_response();
+        }
+
+        if !verify_signature(&payload.device_id, timestamp, signature, client_secret) {
+            return (
+                StatusCode::UNAUTHORIZED,
+                Json(serde_json::json!({
+                    "error": {
+                        "code": -32003,
+                        "message": "Invalid signature"
+                    }
+                })),
+            )
+                .into_response();
+        }
     }
 
     if let Err(e) = state
