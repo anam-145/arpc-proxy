@@ -3,7 +3,10 @@ use chrono::{Duration, Utc};
 use hmac::{Hmac, Mac};
 use sha2::Sha256;
 
-use crate::auth::model::{ApiKey, RegisterRequest, RegisterResponse};
+use crate::{
+    auth::model::{ApiKey, RegisterRequest, RegisterResponse},
+    state::AppState,
+};
 
 type HmacSha256 = Hmac<Sha256>;
 
@@ -40,7 +43,7 @@ pub async fn register(
             .into_response();
     }
 
-    if let Some(ref client_secret) = state.settings.auth.client_secret {
+    if let Some(client_secret) = &state.settings.auth.client_secret {
         let timestamp = match payload.timestamp {
             Some(ts) => ts,
             None => {

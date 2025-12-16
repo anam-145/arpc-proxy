@@ -1,19 +1,14 @@
 # Build stage
-FROM rust:1.83-slim AS builder
+FROM rust:latest AS builder
 
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y pkg-config libssl-dev && rm -rf /var/lib/apt/lists/*
 
+# Copy source and build
 COPY Cargo.toml Cargo.lock* ./
-
-# Cache dependencies
-RUN mkdir src && echo "fn main() {}" > src/main.rs
-RUN cargo build --release && rm -rf src
-
-# Copy actual source and build
 COPY src ./src
-RUN touch src/main.rs && cargo build --release
+RUN cargo build --release
 
 # Runtime stage
 FROM debian:bookworm-slim
